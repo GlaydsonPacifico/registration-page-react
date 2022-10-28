@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import InputMask from "react-input-mask";
+import MakeAnimated  from 'react-select/animated';
+import  Select from 'react-select';
 import {
   Text,
   Flex,
@@ -12,12 +13,13 @@ import {
   Input,
   FormLabel,
   HStack,
-  Select,
   FormHelperText,
   Button,
 } from "@chakra-ui/react";
-import { useCountrys } from "./hooks/useCountrys";
-import { useCitys } from "./hooks/useCitys";
+import { useCountries  } from "./hooks/useCountries";
+import { useCities } from "./hooks/useCities";
+
+const animatedComponets = MakeAnimated();
 
 const schema = yup
   .object()
@@ -29,23 +31,26 @@ const schema = yup
   })
   .required();
 
-function App() {
-  const [selectedCountry, setSelectedCountry] = useState("");
-  const { countrys } = useCountrys();
-  const { citys } = useCitys(selectedCountry);
+function App() {  
+  const { countries } = useCountries ();
+  const { cities } = useCities();
 
-  useEffect(() => {
-    console.log(citys);
-  }, []);
+  const filteredCountries = countries.map((country) => ({
+    key: country.code,
+    value: country.name,
+    label: country.name_ptbr,
+  }));  
+
+  const filteredCities = cities.map((city) => ({
+    key: city.id,
+    value: city.name,
+    label: city.name_ptbr,
+  }));   
+  
 
   const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(schema),
   });
-
-  const handleSelectCountry = (event) => {
-    setSelectedCountry(event.target.value);
-    console.log(event.target.value);
-  };
 
   function handleSubmitForm(data) {
     console.log(data);
@@ -54,7 +59,6 @@ function App() {
   return (
     <Box h={"100vh"}>
       <Center
-        // border={"5px solid #48077b"}
         as="header"
         h={150}
         bg="cyan.600"
@@ -66,7 +70,6 @@ function App() {
         Cadastro
       </Center>
       <Flex
-        // border={"5px solid #48077b"}
         align={"center"}
         flexDir={"column"}
         justify={"center"}
@@ -74,8 +77,7 @@ function App() {
         h={"calc(100vh - 150px)"}
       >
         <Center
-          // border={"5px solid #48077b"}
-          display={"flex"}
+            display={"flex"}
           flexDir={"column"}
           w={"100%"}
           p={"6"}
@@ -165,45 +167,37 @@ function App() {
                   </Box>
                 </HStack>
               </Box>
-
               <Box flex={1}>
                 <Text textAlign={"center"} mb={"4"}>
                   Destinos de Interesse
                 </Text>
                 <HStack>
                   <Box w={"100%"}>
-                    <FormLabel htmlFor="country">País</FormLabel>
+                    <FormLabel htmlFor="country">País</FormLabel>                    
                     <Select
-                      value={selectedCountry}
-                      onChange={handleSelectCountry}
+                      onChange={(item) => setSelectedCountries(item) }
+                      components={animatedComponets}
+                      closeMenuOnSelect={false}
+                      options={filteredCountries}
+                      isMulti
                       placeholder="País"
-                    >
-                      {countrys.map((country, key) => {
-                        return (
-                          <option key={country.code} value={country.code}>
-                            {country.name}
-                          </option>
-                        );
-                      })}
+                      >
                     </Select>
                     <FormHelperText fontSize={"xs"} mb={"3"}>
-                      Selecione sua cidade.
+                      Selecione seu país.
                     </FormHelperText>
                   </Box>
                 </HStack>
                 <HStack>
                   <Box w={"100%"}>
                     <FormLabel htmlFor="city">Cidade</FormLabel>
-                    <Select placeholder="Cidade">
-                      {citys &&
-                        citys.map((city, key) => {
-                          return (
-                            <option key={city.id} value={city.country_code}>
-                              {city.name}
-                            </option>
-                          );
-                        })}
-                    </Select>
+                    <Select
+                      components={animatedComponets}
+                      closeMenuOnSelect={false}
+                      options={filteredCities}
+                      isMulti
+                      placeholder="Cidades"
+                    />                   
                     <FormHelperText fontSize={"xs"} mb={"3"}>
                       Selecione sua cidade.
                     </FormHelperText>
