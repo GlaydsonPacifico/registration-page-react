@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { useCountries  } from "./hooks/useCountries";
 import { useCities } from "./hooks/useCities";
+import { useState } from "react";
 
 const animatedComponets = MakeAnimated();
 
@@ -31,10 +32,12 @@ const schema = yup
   })
   .required();
 
-function App() {  
+function App() { 
+  const [selectedCountries, setSelectedCountries] = useState([])
   const { countries } = useCountries ();
   const { cities } = useCities();
 
+  
   const filteredCountries = countries.map((country) => ({
     key: country.code,
     value: country.name,
@@ -42,64 +45,69 @@ function App() {
   }));  
 
   const filteredCities = cities.map((city) => ({
-    key: city.id,
+    key: city.country_code,
     value: city.name,
     label: city.name_ptbr,
-  }));   
-  
+  }));
 
   const { register, handleSubmit, formState } = useForm({
     resolver: yupResolver(schema),
   });
+  
+  const handleSelectCountry = (event) => {
+    setSelectedCountries(event);
+    console.log(event)
+  };
 
   function handleSubmitForm(data) {
     console.log(data);
   }
 
   return (
-    <Box h={"100vh"}>
+    <Box h="100vh">
       <Center
         as="header"
         h={150}
         bg="cyan.600"
-        color={"white"}
+        color="white"
         fontWeight="bold"
-        fontSize={"6xl"}
+        fontSize="6xl"
         pb="8"
       >
         Cadastro
       </Center>
       <Flex
-        align={"center"}
-        flexDir={"column"}
-        justify={"center"}
+        align="center"
+        flexDir="column"
+        justify="center"
         bg="blackAlpha.200"
-        h={"calc(100vh - 150px)"}
+        h="calc(100vh - 150px)"
+        height={"100%"}
       >
         <Center
-            display={"flex"}
-          flexDir={"column"}
-          w={"100%"}
-          p={"6"}
+          display="flex"
+          flexDir="column"
+          w="100%"
+          p="6"
           maxW={840}
           bg="white"
           top={100}
           position="absolute"
           borderRadius={5}
-          boxShadow={"1px 2px #ccc"}
+          boxShadow="1px 2px #ccc"
         >
           <form
             style={{ width: "100%" }}
             onSubmit={handleSubmit(handleSubmitForm)}
             id="controlForm"
           >
-            <FormControl display={"flex"} p={"4"} gap={4} w={"100%"}>
+            <FormControl isRequired display="flex" p="4" gap={4} w="100%">
               <Box flex={1}>
-                <Text textAlign={"center"} mb={"4"}>
+                <Text textAlign="center" mb="4">
                   Dados Pessoais
                 </Text>
                 <HStack>
-                  <Box w={"100%"}>
+                  <Box w="100%">
                     <FormLabel htmlFor="name">Nome</FormLabel>
                     <Input {...register("name")} id="name" />
                     {formState.errors.name && (
@@ -107,27 +115,27 @@ function App() {
                         Campo nome é obrigatório.
                       </span>
                     )}
-                    <FormHelperText fontSize={"xs"} mb={"3"}>
+                    <FormHelperText fontSize="xs" mb="3">
                       Digite seu nome completo.
                     </FormHelperText>
                   </Box>
                 </HStack>
                 <HStack>
-                  <Box w={"100%"}>
+                  <Box w="100%">
                     <FormLabel htmlFor="email">Email</FormLabel>
-                    <Input {...register("email")} id={"email"} />
+                    <Input {...register("email")} id="email" />
                     {formState.errors.email && (
                       <span style={{ fontSize: 12, color: "#ff0000" }}>
                         Campo email é obrigatório.
                       </span>
                     )}
-                    <FormHelperText fontSize={"xs"} mb={"3"}>
+                    <FormHelperText fontSize="xs" mb="3">
                       Nunca compartilharemos seu e-mail.
                     </FormHelperText>
                   </Box>
                 </HStack>
                 <HStack>
-                  <Box w={"100%"}>
+                  <Box w="100%">
                     <FormLabel htmlFor="phone">Telefone</FormLabel>
                     <Input
                       {...register("phone")}
@@ -141,13 +149,13 @@ function App() {
                         Campo telefone é obrigatório.
                       </span>
                     )}
-                    <FormHelperText fontSize={"xs"} mb={"3"}>
+                    <FormHelperText fontSize="xs" mb="3">
                       Digite apenas números.
                     </FormHelperText>
                   </Box>
                 </HStack>
                 <HStack>
-                  <Box w={"100%"}>
+                  <Box w="100%">
                     <FormLabel htmlFor="cpf">CPF</FormLabel>
                     <Input
                       {...register("cpf")}
@@ -161,21 +169,22 @@ function App() {
                         Campo CPF é obrigatório.
                       </span>
                     )}
-                    <FormHelperText fontSize={"xs"} mb={"3"}>
+                    <FormHelperText fontSize="xs" mb="3">
                       Digite apenas números.
                     </FormHelperText>
                   </Box>
                 </HStack>
               </Box>
               <Box flex={1}>
-                <Text textAlign={"center"} mb={"4"}>
+                <Text textAlign="center" mb="4">
                   Destinos de Interesse
                 </Text>
                 <HStack>
-                  <Box w={"100%"}>
+                  <Box w="100%">
                     <FormLabel htmlFor="country">País</FormLabel>                    
-                    <Select
-                      onChange={(item) => setSelectedCountries(item) }
+                    <Select                      
+                      value={selectedCountries}
+                      onChange={handleSelectCountry}
                       components={animatedComponets}
                       closeMenuOnSelect={false}
                       options={filteredCountries}
@@ -183,22 +192,22 @@ function App() {
                       placeholder="País"
                       >
                     </Select>
-                    <FormHelperText fontSize={"xs"} mb={"3"}>
+                    <FormHelperText fontSize="xs" mb="3">
                       Selecione seu país.
                     </FormHelperText>
                   </Box>
                 </HStack>
                 <HStack>
-                  <Box w={"100%"}>
+                  <Box w="100%">
                     <FormLabel htmlFor="city">Cidade</FormLabel>
-                    <Select
+                    <Select                      
                       components={animatedComponets}
                       closeMenuOnSelect={false}
                       options={filteredCities}
                       isMulti
                       placeholder="Cidades"
                     />                   
-                    <FormHelperText fontSize={"xs"} mb={"3"}>
+                    <FormHelperText fontSize="xs" mb="3">
                       Selecione sua cidade.
                     </FormHelperText>
                   </Box>
@@ -206,14 +215,15 @@ function App() {
               </Box>
             </FormControl>
           </form>
-          <Flex justifyContent={"center"} w={"100%"}>
+          <Flex justifyContent="center" w="100%">
             <Button
               form="controlForm"
               type="submit"
-              boxShadow={"1px 2px #ccc"}
-              size={"lg"}
+              boxShadow="1px 2px #ccc"
+              size="lg"
               colorScheme="cyan"
-              color={"white"}
+              color="white"
+              
             >
               Enviar
             </Button>
