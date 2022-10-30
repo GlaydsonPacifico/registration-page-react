@@ -25,10 +25,12 @@ const animatedComponets = MakeAnimated();
 const schema = yup
   .object()
   .shape({
-    name: yup.string().required(),
-    email: yup.string().email().required(),
-    phone: yup.string("11").required(),
-    cpf: yup.string("11").required(),
+    name: yup.string(),
+    email: yup.string().email(),
+    phone: yup.string("11"),
+    cpf: yup.string("11"),
+    country: yup.array().min(1,"Pelo menos uma opção é necessária"),
+    city: yup.array().min(1,"Pelo menos uma opção é necessária"),
   })
   .required();
 
@@ -56,7 +58,6 @@ function App() {
   
   const handleSelectCountry = (event) => {
     setSelectedCountries(event);
-    console.log(event)
   };
 
   function handleSubmitForm(data) {
@@ -182,7 +183,7 @@ function App() {
                 <HStack>
                   <Box w="100%">
                     <FormLabel htmlFor="country">País</FormLabel>                    
-                    <Select                      
+                    <Select
                       value={selectedCountries}
                       onChange={handleSelectCountry}
                       components={animatedComponets}
@@ -205,7 +206,7 @@ function App() {
                       closeMenuOnSelect={false}
                       options={filteredCities}
                       isMulti
-                      placeholder="Cidades"
+                      placeholder="Cidades"                      
                     />                   
                     <FormHelperText fontSize="xs" mb="3">
                       Selecione sua cidade.
